@@ -16,6 +16,7 @@ namespace ClassGame {
         //
         void GameStartUp() 
         {
+            ConLog.printLog("Started!");
             game = new TicTacToe();
             game->setUpBoard();
         }
@@ -52,6 +53,8 @@ namespace ClassGame {
                 ImGui::Begin("GameWindow");
                 game->drawFrame();
                 ImGui::End();
+
+                ConLog.draw();
         }
 
         //

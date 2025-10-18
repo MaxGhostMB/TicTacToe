@@ -1,6 +1,7 @@
 #pragma once
 #include "Game.h"
 #include "Square.h"
+#include "../Tools/Logger.h"
 
 //
 // the classic game of tic tac toe
