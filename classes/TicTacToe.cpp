@@ -50,12 +50,12 @@ Bit* TicTacToe::PieceForPlayer(const int playerNumber)
 }
 
 
-bool TicTacToe::gameHasAI() {
-    if (_gameOptions.AIPlaying) {
-        return true;
-    }
-    return false;
-}
+// bool TicTacToe::gameHasAI() {
+//     if (_gameOptions.AIPlaying) {
+//         return true;
+//     }
+//     return false;
+// }
 
 
 //
@@ -73,9 +73,13 @@ void TicTacToe::setUpBoard()
         }
     }
 
-    // if (TicTacToe::gameHasAI()) {
+    // if (_gameOptions.AIPlaying) {
+    if (gameHasAI()) {
+        _gameOptions.AIPlaying = true;
+        setAIPlayer(AI_PLAYER);
+    }
+    //     // ConLog.printWarning(std::to_string(_gameOptions.AIPlaying) + " AI triggered");
     //     // _gameOptions.AIPlaying = true;
-    //     setAIPlayer(AI_PLAYER);
     // }
 
 

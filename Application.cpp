@@ -38,9 +38,15 @@ namespace ClassGame {
                 
                 ImGui::Begin("Settings");
 
-                if (ImGui::Button("Play with AI")) {
-                    game->_gameOptions.AIPlaying = true;
-                }
+                // if (ImGui::Button("Play with AI")) {
+                //     game->_gameOptions.AIPlaying = true;
+                //     game->setAIPlayer(1);
+                // } 
+                // else if (ImGui::Button("Play with Human"))
+                // {
+                //     game->setAIPlayer(0);
+                // }
+                
                 
                 ImGui::Text("Current Player Number: %d", game->getCurrentPlayer()->playerNumber());
                 ImGui::Text("Current Board State: %s", game->stateString().c_str());
