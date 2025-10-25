@@ -9,6 +9,8 @@ namespace ClassGame {
         TicTacToe *game = nullptr;
         bool gameOver = false;
         int gameWinner = -1;
+        bool GameAI_O = false;
+        bool GameAI_X = false;
 
         //
         // game starting point
@@ -16,7 +18,7 @@ namespace ClassGame {
         //
         void GameStartUp() 
         {
-            ConLog.printLog("Started!");
+            // ConLog.printLog("Started!");
             game = new TicTacToe();
             game->setUpBoard();
         }
@@ -35,6 +37,11 @@ namespace ClassGame {
                 if (!game->getCurrentPlayer()) return;
                 
                 ImGui::Begin("Settings");
+
+                if (ImGui::Button("Play with AI")) {
+                    game->_gameOptions.AIPlaying = true;
+                }
+                
                 ImGui::Text("Current Player Number: %d", game->getCurrentPlayer()->playerNumber());
                 ImGui::Text("Current Board State: %s", game->stateString().c_str());
 

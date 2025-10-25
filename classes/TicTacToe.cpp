@@ -24,8 +24,8 @@
 // The rest of the routines are written as “comment-first” TODOs for you to complete.
 // -----------------------------------------------------------------------------
 
-const int AI_PLAYER   = 1;      // index of the AI player (O)
-const int HUMAN_PLAYER= 0;      // index of the human player (X)
+const int AI_PLAYER    = 1;      // index of the AI player (O)
+const int HUMAN_PLAYER = -1;      // index of the human player (X)
 
 TicTacToe::TicTacToe()
 {
@@ -39,6 +39,7 @@ TicTacToe::~TicTacToe()
 // make an X or an O
 // -----------------------------------------------------------------------------
 // DO NOT CHANGE: This returns a new Bit with the right texture and owner
+
 Bit* TicTacToe::PieceForPlayer(const int playerNumber)
 {
     // depending on playerNumber load the "x.png" or the "o.png" graphic
@@ -47,6 +48,15 @@ Bit* TicTacToe::PieceForPlayer(const int playerNumber)
     bit->setOwner(getPlayerAt(playerNumber));
     return bit;
 }
+
+
+bool TicTacToe::gameHasAI() {
+    if (_gameOptions.AIPlaying) {
+        return true;
+    }
+    return false;
+}
+
 
 //
 // setup the game board, this is called once at the start of the game
@@ -59,9 +69,16 @@ void TicTacToe::setUpBoard()
     // this section loops through and loads the emtpy squares into a 3x3 grid
     for (int y = 0; y < _gameOptions.rowY; y++) {
         for (int x = 0; x <_gameOptions.rowX; x++ ){
-            _grid[y][x].initHolder(ImVec2(x*100, y*100) ,"square.png", x,y);
+            _grid[y][x].initHolder(ImVec2(x*100, y*100) ,"square.png", x, y);
         }
     }
+
+    // if (TicTacToe::gameHasAI()) {
+    //     // _gameOptions.AIPlaying = true;
+    //     setAIPlayer(AI_PLAYER);
+    // }
+
+
     startGame();
 }
 
@@ -248,8 +265,93 @@ void TicTacToe::setStateString(const std::string &s)
 //
 // this is the function that will be called by the AI
 //
-void TicTacToe::updateAI() 
-{
-    // we will implement the AI in the next assignment!
+void TicTacToe::updateAI() {
+	int bestMove = -1000;
+	int bestSquare = -1;
+	std::string state = stateString();
+	
+	for (int i = 0; i < 9; i++) {
+		if (state[i] == '0') {
+			state[i] = '2';
+            // ConLog.printWarning("we are at state: " + state + "\n player: " + std::to_string(HUMAN_PLAYER));
+			int negamax_ = -TicTacToe::negamax(state, 0, HUMAN_PLAYER);
+			if (negamax_ > bestMove) {
+				bestMove = negamax_;
+				bestSquare = i;
+			}
+			state[i] = '0';
+		}
+	}
+	if (bestSquare != -1) {
+		int xcol = bestSquare % 3;
+		int ycol = bestSquare / 3;
+		BitHolder *holder = &getHolderAt(xcol , ycol);
+        actionForEmptyHolder(holder);
+		endTurn();
+	}
+ }
+
+bool TicTacToe::AIBoardFull(std::string state) {
+	if (state.find('0') == std::string::npos) {
+		return true;
+	}
+	return false;
 }
 
+int TicTacToe::AIWinner(std::string state) {
+	// check all win conditions for Tic Tac Toe
+	// we don't care who won in this function, we just care that one exists
+    std::string _currentState = state;
+
+    // each win state 
+    int _winStates[8][3] = {
+        {0, 1, 2},
+        {3, 4, 5},
+        {6, 7, 8},
+        {0, 3, 6},
+        {1, 4, 7},
+        {2, 5, 8},
+        {0, 4, 8},
+        {2, 4, 6}
+    };
+    for (auto _state : _winStates) {
+        // chechs if there is a 0 in each of the 3 locations in the statestring
+        // if so there cant be a win state and returns a nullptr
+        if (_currentState[_state[0]] != '0' &&
+            _currentState[_state[1]] != '0' && 
+            _currentState[_state[2]] != '0') {
+                // checks if all 3 locations have the same value
+                if (_currentState[_state[0]] == _currentState[_state[1]] &&
+                    _currentState[_state[1]] == _currentState[_state[2]]) {
+                        return _currentState[_state[0]];
+                    }
+            }
+    }
+    return 0;
+}
+
+int TicTacToe::negamax(std::string state, int depth, int playerColor) {
+	int bestVal = -1000;
+	int boardWinner = AIWinner(state);
+	if (boardWinner) {
+		// we are returning to the recursive version above
+		return -boardWinner;
+	}
+	bool boardFull = AIBoardFull(state);
+	if (boardFull) {
+		// draw
+		return 0;	
+	}
+	
+	for (int i = 0; i < 9; i++) {
+		if (state[i] == '0') {
+			state[i] = playerColor == HUMAN_PLAYER ? '1': '2';
+			int result = -negamax(state, depth + 1, -playerColor);
+			if (result > bestVal) {
+				bestVal = result;
+			}
+			state[i] = '0';
+		}
+	}
+	return bestVal;
+}
